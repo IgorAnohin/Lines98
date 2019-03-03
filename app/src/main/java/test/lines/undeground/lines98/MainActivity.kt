@@ -13,6 +13,7 @@ import org.jetbrains.anko.textColor
 import org.jetbrains.anko.toast
 
 class ButtonManager(val button: Button, var color: Int = Color.WHITE, private var _hinted: Boolean = false) {
+
     var hinted: Boolean
         get() = _hinted
         set(value) {
@@ -31,9 +32,9 @@ class MainActivity : AppCompatActivity() {
 
     val buttonsManagersList = arrayListOf<ButtonManager>()
     var hintedValuesForNextStep = arrayListOf<Int>()
-    private val ITEMS_IN_ROW = 5
+    private val ITEMS_IN_ROW = 8
     private val CREATED_ITEMS_PER_STEP = 3
-    private val SIMILAR_ITEMS_TO_CLEAR = 3
+    private val SIMILAR_ITEMS_TO_CLEAR = 5
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -289,8 +290,6 @@ class MainActivity : AppCompatActivity() {
                                 tempUpShift++
                                 leftDownTableIndex += (ITEMS_IN_ROW - 1)
                             }
-
-                            toast((rightUpTableIndex..leftDownTableIndex step ITEMS_IN_ROW-1).toString())
 
                             var similarItems = 0
                             var clearingRightLeftDiagRange : IntProgression = IntRange.EMPTY

@@ -6,30 +6,68 @@
     android:layout_height="match_parent"
     tools:context="test.lines.undeground.lines98.MainActivity">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:weightSum="4">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="1.25"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:weightSum="3">
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:layout_weight="1"/>
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="center"
+                android:src="@mipmap/ic_launcher"
+                android:layout_weight="1"/>
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="center"
+                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:layout_weight="1"/>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/scores"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:weightSum="2">
+            android:layout_weight="1.18"
+            android:weightSum="3">
 
             <TextView
                 android:id="@+id/current_score"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAlignment="viewEnd"
                 android:layout_weight="1"
                 android:padding="20dp"
                 android:text="0" />
 
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="center"
+                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:layout_weight="1"/>
+
             <TextView
                 android:id="@+id/best_score"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textAlignment="viewStart"
                 android:layout_weight="1"
                 android:padding="20dp"
                 android:text="1234" />
@@ -37,38 +75,40 @@
 
         <TableLayout
             android:id="@+id/buttons"
-            android:layout_below="@+id/scores"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_weight="0.4">
         </TableLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:weightSum="3"
-            android:layout_alignParentBottom="true">
+            android:layout_weight="1.17"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:weightSum="3">
             <ImageView
-                android:layout_weight="1"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:scaleType="center"
-                android:src="@drawable/ic_blur_circular_black_24dp"/>
+                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:layout_weight="1"/>
             <ImageView
-                android:layout_weight="1"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:scaleType="center"
-                android:src="@drawable/ic_blur_circular_black_24dp"/>
+                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:layout_weight="1"/>
             <ImageView
-                android:layout_weight="1"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:scaleType="center"
-                android:src="@drawable/ic_blur_circular_black_24dp"/>
+                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:layout_weight="1"/>
         </LinearLayout>
 
 
-    </RelativeLayout>
+    </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
