@@ -2,17 +2,56 @@ package test.lines.undeground.lines98
 
 import android.graphics.Color
 import android.graphics.Color.argb
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.LayerDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import org.jetbrains.anko.padding
 import org.jetbrains.anko.textColor
 
 import org.jetbrains.anko.toast
 
-class ButtonManager(val button: Button, var color: Int = Color.WHITE, private var _hinted: Boolean = false) {
+class ButtonManager(val button: Button,
+                    val imageView: ImageView,
+                    var color: Int = Color.WHITE,
+                    private var _hinted: Boolean = false) {
+    companion object {
+        val NO_RESOURCE = 0
+        val imagesResourcesIdMap =  mapOf(1 to R.drawable.circle_black, 2 to R.drawable.circle_black, 3 to R.drawable.circle_black)
+    }
+
+
+    private var _resource = NO_RESOURCE
+
+    var resource: Int
+        get() = _resource
+        set(value) {
+            if (value == NO_RESOURCE) {
+                button.isClickable = false
+                imageView.visibility = ImageView.GONE
+                button.text = ""
+
+            } else {
+                button.isClickable = true
+                imageView.visibility = ImageView.VISIBLE
+//                val changeImRunnable: Runnable = object : Runnable {
+//                    override fun run() {
+//                        val picture = imagesResourcesIdMap[resource]
+//                        if (picture != null)
+//                            imageView.setBackgroundResource(picture)
+//                        imageView.requestLayout()
+//                    }
+//                }
+
+//                imageView.post(changeImRunnable)
+
+            }
+
+            _resource = value
+        }
+
 
     var hinted: Boolean
         get() = _hinted
@@ -22,10 +61,27 @@ class ButtonManager(val button: Button, var color: Int = Color.WHITE, private va
                 button.isClickable = false
             } else {
                 button.textColor = argb(0xFF, 0x00, 0x00, 0x00)
-                button.isClickable = !button.text.isEmpty()
+                button.isClickable = true
+//                val height = imageView.height
+//                val wight = imageView.width
+//                val x = imageView.x
+//                val y = imageView.y
+//                imageView.layoutParams.width = wight * 2
+//                imageView.layoutParams.height = height * 2
+//                imageView.requestLayout()
+//                imageView.x = x - wight / 2
+//                imageView.y = y - height / 2
+//                imageView.invalidate()
             }
             _hinted = value
         }
+
+    fun makeButtonPicked() {
+        val background = button.background
+        if (background is GradientDrawable)
+            background.setColor(argb(0xAA, 0x00, 0xFF, 0x00))
+        this.color = Color.GREEN
+    }
 }
 
 class MainActivity : AppCompatActivity() {
@@ -35,6 +91,7 @@ class MainActivity : AppCompatActivity() {
     private val ITEMS_IN_ROW = 8
     private val CREATED_ITEMS_PER_STEP = 3
     private val SIMILAR_ITEMS_TO_CLEAR = 5
+    private val RESOURCES_IN_GAME = ButtonManager.imagesResourcesIdMap.size
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,58 +108,83 @@ class MainActivity : AppCompatActivity() {
                 )
 
             for (column in 0..(ITEMS_IN_ROW - 1)) {
-                val button = Button(this)
-                button.id = row * ITEMS_IN_ROW + column
-                button.setBackgroundResource(R.drawable.empty_shape)
-                val buttonManager = ButtonManager(button)
-
-
-                button.layoutParams = TableRow.LayoutParams(
+                val framelayout = FrameLayout(this)
+                framelayout.layoutParams = TableRow.LayoutParams(
                         TableRow.LayoutParams.MATCH_PARENT,
                         TableRow.LayoutParams.MATCH_PARENT,
                         1.0f
                 )
+                val id = row * ITEMS_IN_ROW + column
+//                framelayout.id = id
+
+                val button = Button(this)
+                button.id = id
+                button.setBackgroundResource(R.drawable.empty_shape)
+                button.layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                val imageView = ImageView(this)
+                imageView.setBackgroundResource(R.drawable.circular_black_64dp)
+                imageView.layoutParams = FrameLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.MATCH_PARENT
+                )
+                imageView.elevation = 9.0f
+                imageView.scaleType = ImageView.ScaleType.CENTER
+                imageView.visibility = ImageView.GONE
+
+                framelayout.addView(button)
+                framelayout.addView(imageView)
+                val buttonManager = ButtonManager(button, imageView)
+
+
 
                 button.setOnClickListener(object: View.OnClickListener {
                     override fun onClick(v: View?) {
-                        val buttonManager = buttonsManagersList[button.id]
-
-
-                        val background = button.background
-                        if (background is GradientDrawable)
+                        val imBut = findViewById<ImageButton>(R.id.test_button)
+                        imBut.padding = 20
+                        val buttonManager = buttonsManagersList[id]
                         when (buttonManager.color) {
                             Color.GREEN -> {
-                                return_desk_neutral_state(buttonsManagersList)
+                                returnDeskToNeutralState(buttonsManagersList)
                             }
 
                             Color.BLUE -> {
-                                val buttonForSwap = findPickedForSwapButton(buttonsManagersList)
-                                button.text = buttonForSwap.text
-                                buttonForSwap.text = ""
-                                return_desk_neutral_state(buttonsManagersList)
-
-                                generateStepsResults(button.id)
+                                val mangerForSwap = findPickedForSwapButton(buttonsManagersList)
+                                buttonManager.resource = mangerForSwap.resource
+                                mangerForSwap.resource = ButtonManager.NO_RESOURCE
+                                returnDeskToNeutralState(buttonsManagersList)
+                                generateStepsResults(id)
                             }
 
                             else -> {
                                 if (!buttonManager.hinted) {
-                                    background.setColor(argb(0xAA, 0x00, 0xFF, 0x00))
-                                    buttonManager.color = Color.GREEN
-                                    for (buttonManager in buttonsManagersList) {
-                                        val but = buttonManager.button
-                                        if (!but.text.isEmpty() && but.id != button.id && !buttonManager.hinted)
-                                            but.isClickable = false
-                                    }
-                                    setClickableButtons(buttonsManagersList, button.id)
+                                    buttonManager.makeButtonPicked()
+                                    prepareDeskForPicking(buttonsManagersList, id)
                                 }
                             }
+                        }
+                    }
+
+                    fun prepareDeskForPicking(buttonsManagers: ArrayList<ButtonManager>, pickedButtonIndex: Int) {
+                        makeButtonsUnclickable(buttonsManagers, pickedButtonIndex)
+                        setClickableButtons(buttonsManagers, pickedButtonIndex)
+                    }
+
+                    fun makeButtonsUnclickable(buttonsManagers: ArrayList<ButtonManager>, pickedButtonIndex: Int) {
+                        for (buttonManager in buttonsManagers) {
+                            val but = buttonManager.button
+                            if (but.id != button.id)
+                                but.isClickable = false
                         }
                     }
 
                     fun setClickableButtons(buttonsManagers: ArrayList<ButtonManager>, pickedButtonIndex: Int) {
                         fun setButtonHintToClicked(buttonManager: ButtonManager) {
                             val button = buttonManager.button
-                            if ((button.text.isEmpty() || buttonManager.hinted) && buttonManager.color != Color.BLUE) {
+                            if ((buttonManager.resource == ButtonManager.NO_RESOURCE || buttonManager.hinted)
+                                 && buttonManager.color != Color.BLUE) {
                                 val background = button.background
                                 if (background is GradientDrawable)
                                     background.setColor(argb(0xFF, 0x00, 0x00, 0xFF))
@@ -135,25 +217,49 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    fun findPickedForSwapButton(buttonsManagers: ArrayList<ButtonManager>): Button {
+                    fun findPickedForSwapButton(buttonsManagers: ArrayList<ButtonManager>): ButtonManager {
                         for (manager in buttonsManagers)
                             if (manager.color == Color.GREEN)
-                                return manager.button
+                                return manager
                         throw Exception("Button not found")
                     }
 
-                    fun return_desk_neutral_state(buttonsManagers: ArrayList<ButtonManager>) {
+                    fun returnDeskToNeutralState(buttonsManagers: ArrayList<ButtonManager>) {
                         for (manager in buttonsManagers) {
                             val but = manager.button
                             val background = but.background
                             if (background is GradientDrawable)
                                 background.setColor(argb(0xFF, 0xFF, 0xFF, 0xFF))
                             manager.color = Color.WHITE
-                            but.isClickable = !but.text.isEmpty()
+                            but.isClickable = manager.resource != ButtonManager.NO_RESOURCE
                         }
                     }
 
                     fun generateStepsResults(pickedButtonIndex: Int) {
+                        for (value in hintedValuesForNextStep) {
+                            val buttonManager = buttonsManagersList[value]
+                            val imView = buttonManager.imageView
+                            val myRunnableLow: Runnable = object : Runnable {
+                                override fun run() {
+                                    val height = imView.height
+                                    val wight = imView.width
+                                    val x = imView.x
+                                    val y = imView.y
+
+                                    imView.layoutParams.width = wight * 2
+                                    imView.layoutParams.height = height * 2
+                                    imView.requestLayout()
+                                    imView.x = x - wight / 2
+                                    imView.y = y - height / 2
+                                    imView.invalidate()
+                                    imView.refreshDrawableState()
+                                    imView.forceLayout()
+                                    imView.requestLayout()
+                                }
+                            }
+
+                            imView.post(myRunnableLow)
+                        }
                         val extraItems = convertHintedToNormal(hintedValuesForNextStep)
                         extraItems.add(pickedButtonIndex)
                         freeSomeSpaces(buttonsManagersList, extraItems)
@@ -162,13 +268,37 @@ class MainActivity : AppCompatActivity() {
                             toast("Game is over :\\")
                         else {
                             hintedValuesForNextStep = generateRandomItems(CREATED_ITEMS_PER_STEP)
+                            for (value in hintedValuesForNextStep) {
+                                val buttonManager = buttonsManagersList[value]
+                                val imView = buttonManager.imageView
+                                val myRunnableUp: Runnable = object : Runnable {
+                                    override fun run() {
+                                        val height = imView.height
+                                        val wight = imView.width
+                                        val x = imView.x
+                                        val y = imView.y
+
+
+                                        imView.layoutParams.width = wight / 2
+                                        imView.layoutParams.height = height / 2
+                                        imView.requestLayout()
+                                        imView.x = x + wight / 4
+                                        imView.y = y + height / 4
+                                        imView.invalidate()
+                                        imView.refreshDrawableState()
+                                        imView.forceLayout()
+                                        imView.requestLayout()
+                                    }
+                                }
+                                imView.post(myRunnableUp)
+                            }
                         }
                     }
 
                     fun freeSomeSpaces(buttonsManagers: ArrayList<ButtonManager>, pickedButtonIndexes: ArrayList<Int>) {
 
                         fun getHorizontalRangeForClear(buttonsManagers: ArrayList<ButtonManager>, pickedButtonIndex: Int): IntProgression {
-                            val checkedNumber = buttonsManagers[pickedButtonIndex].button.text
+                            val checkedNumber = buttonsManagers[pickedButtonIndex].resource
                             val leftIndex = (pickedButtonIndex / ITEMS_IN_ROW) * ITEMS_IN_ROW
                             val rightNotIncludedIndex = ((pickedButtonIndex / ITEMS_IN_ROW) + 1) * ITEMS_IN_ROW
 
@@ -176,7 +306,7 @@ class MainActivity : AppCompatActivity() {
                             var clearingHorizontalRange : IntProgression = IntRange.EMPTY
                             var firstSimilarItem = -1
                             for (index in (leftIndex..(rightNotIncludedIndex - 1)))
-                                if (buttonsManagers[index].button.text == checkedNumber) {
+                                if (buttonsManagers[index].resource == checkedNumber) {
                                     if (similarItems == 0) {
                                         firstSimilarItem = index
                                     }
@@ -195,7 +325,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         fun getVerticalRangeForClear(buttonsManagers: ArrayList<ButtonManager>, pickedButtonIndex: Int): IntProgression {
-                            val checkedNumber = buttonsManagers[pickedButtonIndex].button.text
+                            val checkedNumber = buttonsManagers[pickedButtonIndex].resource
                             val uppTableIndex = pickedButtonIndex % ITEMS_IN_ROW
                             val downTableIndex = pickedButtonIndex % ITEMS_IN_ROW + (ITEMS_IN_ROW * (ITEMS_IN_ROW - 1))
 
@@ -203,7 +333,7 @@ class MainActivity : AppCompatActivity() {
                             var clearingVerticalRange : IntProgression = IntRange.EMPTY
                             var firstSimilarItem = -1
                             for (index in (uppTableIndex..downTableIndex step ITEMS_IN_ROW))
-                                if (buttonsManagers[index].button.text == checkedNumber) {
+                                if (buttonsManagers[index].resource == checkedNumber) {
                                     if (similarItems == 0) {
                                         firstSimilarItem = index
                                     }
@@ -222,7 +352,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         fun getLeftRightDiagRangeForClear(buttonsManagers: ArrayList<ButtonManager>, pickedButtonIndex: Int): IntProgression {
-                            val checkedNumber = buttonsManagers[pickedButtonIndex].button.text
+                            val checkedNumber = buttonsManagers[pickedButtonIndex].resource
 
                             val leftShift = pickedButtonIndex % ITEMS_IN_ROW
                             val upShift = pickedButtonIndex / ITEMS_IN_ROW
@@ -249,7 +379,7 @@ class MainActivity : AppCompatActivity() {
                             var clearingLeftRightDiagRange : IntProgression = IntRange.EMPTY
                             var firstSimilarItem = -1
                             for (index in (leftUpTableIndex..topDownTableIndex step ITEMS_IN_ROW+1))
-                                if (buttonsManagers[index].button.text == checkedNumber) {
+                                if (buttonsManagers[index].resource == checkedNumber) {
                                     if (similarItems == 0) {
                                         firstSimilarItem = index
                                     }
@@ -268,7 +398,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                         fun getRightLeftDiagRangeForClear(buttonsManagers: ArrayList<ButtonManager>, pickedButtonIndex: Int): IntProgression {
-                            val checkedNumber = buttonsManagers[pickedButtonIndex].button.text
+                            val checkedNumber = buttonsManagers[pickedButtonIndex].resource
 
                             val leftShift = pickedButtonIndex % ITEMS_IN_ROW
                             val upShift = pickedButtonIndex / ITEMS_IN_ROW
@@ -295,7 +425,7 @@ class MainActivity : AppCompatActivity() {
                             var clearingRightLeftDiagRange : IntProgression = IntRange.EMPTY
                             var firstSimilarItem = -1
                             for (index in (rightUpTableIndex..leftDownTableIndex step ITEMS_IN_ROW-1))
-                                if (buttonsManagers[index].button.text == checkedNumber) {
+                                if (buttonsManagers[index].resource == checkedNumber) {
                                     if (similarItems == 0) {
                                         firstSimilarItem = index
                                     }
@@ -330,7 +460,7 @@ class MainActivity : AppCompatActivity() {
                         if (clearRanges.isNotEmpty()) {
                             for (range in clearRanges)
                                 for (index in range)
-                                    buttonsManagers[index].button.text = ""
+                                    buttonsManagers[index].resource = 0
                         }
                     }
 
@@ -344,7 +474,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
                 button.isClickable=false
-                tableRow.addView(button)
+                tableRow.addView(framelayout)
                 buttonsManagersList.add(buttonManager)
             }
             buttonsTable.addView(tableRow)
@@ -353,6 +483,32 @@ class MainActivity : AppCompatActivity() {
         val hintedButtonsIds = generateRandomItems(CREATED_ITEMS_PER_STEP)
         convertHintedToNormal(hintedButtonsIds)
         hintedValuesForNextStep = generateRandomItems(CREATED_ITEMS_PER_STEP)
+        for (value in hintedValuesForNextStep) {
+            val buttonManager = buttonsManagersList[value]
+            val imView = buttonManager.imageView
+            val myRunnable: Runnable = object : Runnable {
+                override fun run() {
+                    val height = imView.height
+                    val wight = imView.width
+                    val x = imView.x
+                    val y = imView.y
+
+                    imView.layoutParams.width = wight / 2
+                    imView.layoutParams.height = height / 2
+
+                    imView.requestLayout()
+                    imView.x = x + wight / 4
+                    imView.y = y + height / 4
+                    imView.invalidate()
+                    imView.refreshDrawableState()
+                    imView.forceLayout()
+                    imView.requestLayout()
+                }
+            }
+
+            imView.post(myRunnable)
+
+        }
     }
 
     fun generateRandomItems(itemsToCreate: Int) : ArrayList<Int> {
@@ -360,13 +516,14 @@ class MainActivity : AppCompatActivity() {
         for (item in 1..itemsToCreate) {
             var unique = false
             while (!unique) {
-                val randomButtonId = (0..(ITEMS_IN_ROW * ITEMS_IN_ROW - 1)).shuffled().first()
-                val button = buttonsManagersList[randomButtonId].button
-                if (button.text.isEmpty()) {
-                    button.text = item.toString()
+                val randomId = (0..(ITEMS_IN_ROW * ITEMS_IN_ROW - 1)).shuffled().first()
+                val buttonManager = buttonsManagersList[randomId]
+                val resource = buttonManager.resource
+                if (resource == ButtonManager.NO_RESOURCE) {
+                    buttonManager.resource = (1..(RESOURCES_IN_GAME-1)).shuffled().first()
                     unique = true
-                    buttonsManagersList[randomButtonId].hinted = true
-                    usedIds.add(randomButtonId)
+                    buttonsManagersList[randomId].hinted = true
+                    usedIds.add(randomId)
                 }
             }
         }

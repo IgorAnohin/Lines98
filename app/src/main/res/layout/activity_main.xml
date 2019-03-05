@@ -7,6 +7,7 @@
     tools:context="test.lines.undeground.lines98.MainActivity">
 
     <LinearLayout
+        android:id="@+id/root"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -23,19 +24,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="center"
-                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:src="@drawable/circular_black_64dp"
                 android:layout_weight="1"/>
-            <ImageView
+            <ImageButton
+                android:id="@+id/test_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scaleType="center"
+                android:scaleType="fitCenter"
+                android:padding="5dp"
                 android:src="@mipmap/ic_launcher"
+                android:background="@drawable/empty_shape"
                 android:layout_weight="1"/>
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scaleType="center"
-                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:src="@drawable/circular_black_64dp"
                 android:layout_weight="1"/>
         </LinearLayout>
 
@@ -60,7 +64,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="center"
-                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:src="@drawable/circular_black_64dp"
                 android:layout_weight="1"/>
 
             <TextView
@@ -86,25 +90,24 @@
             android:orientation="horizontal"
             android:layout_weight="1.17"
             android:layout_gravity="center"
-            android:gravity="center"
-            android:weightSum="3">
+            android:gravity="center">
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="center"
-                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:src="@drawable/circular_black_64dp"
                 android:layout_weight="1"/>
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scaleType="center"
-                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:src="@drawable/circular_black_64dp"
                 android:layout_weight="1"/>
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scaleType="center"
-                android:src="@drawable/ic_blur_circular_black_24dp"
+                android:src="@drawable/circular_black_64dp"
                 android:layout_weight="1"/>
         </LinearLayout>
 
