@@ -19,7 +19,11 @@ class ButtonManager(val button: Button,
                     private var _hinted: Boolean = false) {
     companion object {
         val NO_RESOURCE = 0
-        val imagesResourcesIdMap =  mapOf(1 to R.drawable.circle_black, 2 to R.drawable.circle_black, 3 to R.drawable.circle_black)
+        val imagesResourcesIdMap =  mapOf(
+                1 to R.drawable.circle_black,
+                2 to R.drawable.circle_yellow,
+                3 to R.drawable.circle_pink,
+                4 to R.drawable.circle_orange)
     }
 
 
@@ -36,16 +40,16 @@ class ButtonManager(val button: Button,
             } else {
                 button.isClickable = true
                 imageView.visibility = ImageView.VISIBLE
-//                val changeImRunnable: Runnable = object : Runnable {
-//                    override fun run() {
-//                        val picture = imagesResourcesIdMap[resource]
-//                        if (picture != null)
-//                            imageView.setBackgroundResource(picture)
-//                        imageView.requestLayout()
-//                    }
-//                }
+                val changeImRunnable: Runnable = object : Runnable {
+                    override fun run() {
+                        val picture = imagesResourcesIdMap[resource]
+                        if (picture != null)
+                            imageView.setBackgroundResource(picture)
+                        imageView.requestLayout()
+                    }
+                }
 
-//                imageView.post(changeImRunnable)
+                imageView.post(changeImRunnable)
 
             }
 
@@ -124,12 +128,18 @@ class MainActivity : AppCompatActivity() {
                         FrameLayout.LayoutParams.MATCH_PARENT,
                         FrameLayout.LayoutParams.MATCH_PARENT
                 )
+                val background = button.background
+                if (background is GradientDrawable)
+                    background.setColor(argb(0x00, 0xFF, 0xFF, 0xFF))
+
                 val imageView = ImageView(this)
                 imageView.setBackgroundResource(R.drawable.circular_black_64dp)
-                imageView.layoutParams = FrameLayout.LayoutParams(
+                val layout = FrameLayout.LayoutParams(
                         FrameLayout.LayoutParams.MATCH_PARENT,
                         FrameLayout.LayoutParams.MATCH_PARENT
                 )
+                layout.setMargins(5, 5, 5, 5)
+                imageView.layoutParams = layout
                 imageView.elevation = 9.0f
                 imageView.scaleType = ImageView.ScaleType.CENTER
                 imageView.visibility = ImageView.GONE
@@ -229,7 +239,7 @@ class MainActivity : AppCompatActivity() {
                             val but = manager.button
                             val background = but.background
                             if (background is GradientDrawable)
-                                background.setColor(argb(0xFF, 0xFF, 0xFF, 0xFF))
+                                background.setColor(argb(0x00, 0xFF, 0xFF, 0xFF))
                             manager.color = Color.WHITE
                             but.isClickable = manager.resource != ButtonManager.NO_RESOURCE
                         }
@@ -241,16 +251,14 @@ class MainActivity : AppCompatActivity() {
                             val imView = buttonManager.imageView
                             val myRunnableLow: Runnable = object : Runnable {
                                 override fun run() {
-                                    val height = imView.height
-                                    val wight = imView.width
-                                    val x = imView.x
-                                    val y = imView.y
+                                    val layout = FrameLayout.LayoutParams(
+                                            FrameLayout.LayoutParams.MATCH_PARENT,
+                                            FrameLayout.LayoutParams.MATCH_PARENT
+                                    )
+                                    layout.setMargins(5, 5, 5, 5)
+                                    imView.layoutParams = layout
 
-                                    imView.layoutParams.width = wight * 2
-                                    imView.layoutParams.height = height * 2
                                     imView.requestLayout()
-                                    imView.x = x - wight / 2
-                                    imView.y = y - height / 2
                                     imView.invalidate()
                                     imView.refreshDrawableState()
                                     imView.forceLayout()
@@ -273,21 +281,19 @@ class MainActivity : AppCompatActivity() {
                                 val imView = buttonManager.imageView
                                 val myRunnableUp: Runnable = object : Runnable {
                                     override fun run() {
-                                        val height = imView.height
-                                        val wight = imView.width
-                                        val x = imView.x
-                                        val y = imView.y
+                                        val layout = FrameLayout.LayoutParams(
+                                                FrameLayout.LayoutParams.MATCH_PARENT,
+                                                FrameLayout.LayoutParams.MATCH_PARENT
+                                        )
+                                        layout.setMargins(20, 20, 20, 20)
+                                        imView.layoutParams = layout
 
-
-                                        imView.layoutParams.width = wight / 2
-                                        imView.layoutParams.height = height / 2
                                         imView.requestLayout()
-                                        imView.x = x + wight / 4
-                                        imView.y = y + height / 4
                                         imView.invalidate()
                                         imView.refreshDrawableState()
                                         imView.forceLayout()
                                         imView.requestLayout()
+
                                     }
                                 }
                                 imView.post(myRunnableUp)
@@ -488,17 +494,14 @@ class MainActivity : AppCompatActivity() {
             val imView = buttonManager.imageView
             val myRunnable: Runnable = object : Runnable {
                 override fun run() {
-                    val height = imView.height
-                    val wight = imView.width
-                    val x = imView.x
-                    val y = imView.y
-
-                    imView.layoutParams.width = wight / 2
-                    imView.layoutParams.height = height / 2
+                    val layout = FrameLayout.LayoutParams(
+                            FrameLayout.LayoutParams.MATCH_PARENT,
+                            FrameLayout.LayoutParams.MATCH_PARENT
+                    )
+                    layout.setMargins(20, 20, 20, 20)
+                    imView.layoutParams = layout
 
                     imView.requestLayout()
-                    imView.x = x + wight / 4
-                    imView.y = y + height / 4
                     imView.invalidate()
                     imView.refreshDrawableState()
                     imView.forceLayout()
@@ -520,7 +523,7 @@ class MainActivity : AppCompatActivity() {
                 val buttonManager = buttonsManagersList[randomId]
                 val resource = buttonManager.resource
                 if (resource == ButtonManager.NO_RESOURCE) {
-                    buttonManager.resource = (1..(RESOURCES_IN_GAME-1)).shuffled().first()
+                    buttonManager.resource = (1..RESOURCES_IN_GAME).shuffled().first()
                     unique = true
                     buttonsManagersList[randomId].hinted = true
                     usedIds.add(randomId)
