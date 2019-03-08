@@ -2,16 +2,17 @@ package test.lines.undeground.lines98
 
 import android.graphics.Color
 import android.graphics.Color.argb
+import android.graphics.Point
 import android.graphics.drawable.GradientDrawable
-import android.graphics.drawable.LayerDrawable
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.*
 import org.jetbrains.anko.padding
-import org.jetbrains.anko.textColor
 
 import org.jetbrains.anko.toast
+import android.view.Gravity
+
 
 class ButtonManager(val button: Button,
                     val imageView: ImageView,
@@ -60,23 +61,7 @@ class ButtonManager(val button: Button,
     var hinted: Boolean
         get() = _hinted
         set(value) {
-            if (value) {
-                button.textColor = argb(0xFF, 0xd3, 0xd3, 0xd3)
-                button.isClickable = false
-            } else {
-                button.textColor = argb(0xFF, 0x00, 0x00, 0x00)
-                button.isClickable = true
-//                val height = imageView.height
-//                val wight = imageView.width
-//                val x = imageView.x
-//                val y = imageView.y
-//                imageView.layoutParams.width = wight * 2
-//                imageView.layoutParams.height = height * 2
-//                imageView.requestLayout()
-//                imageView.x = x - wight / 2
-//                imageView.y = y - height / 2
-//                imageView.invalidate()
-            }
+            button.isClickable = !value
             _hinted = value
         }
 
@@ -92,31 +77,53 @@ class MainActivity : AppCompatActivity() {
 
     val buttonsManagersList = arrayListOf<ButtonManager>()
     var hintedValuesForNextStep = arrayListOf<Int>()
+    var hintedImagesPlaces = arrayListOf<ImageView>()
     private val ITEMS_IN_ROW = 8
     private val CREATED_ITEMS_PER_STEP = 3
     private val SIMILAR_ITEMS_TO_CLEAR = 5
     private val RESOURCES_IN_GAME = ButtonManager.imagesResourcesIdMap.size
 
+    // Width always is less, than hight
+    private var BUTTON_FRAME_WIDTH = 0
+    private var SCREEN_WIDTH = 0
+    private var HINT_MARGIN_PERC = 0
+    private var NORMAL_MARGIN_PERC = 0
+
+    fun getScreenWidth() : Int {
+        val display = windowManager.defaultDisplay
+        val size = Point()
+        display.getSize(size)
+        return size.x
+    }
+
+    fun setButtonsParameters(screenWidth: Int) {
+        BUTTON_FRAME_WIDTH = screenWidth / ITEMS_IN_ROW
+        HINT_MARGIN_PERC = (BUTTON_FRAME_WIDTH * 0.25).toInt()
+        NORMAL_MARGIN_PERC = (BUTTON_FRAME_WIDTH * 0.1).toInt()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        SCREEN_WIDTH = getScreenWidth()
+        setButtonsParameters(SCREEN_WIDTH)
+
 
         val buttonsTable = findViewById<TableLayout>(R.id.buttons)
 
         for (row in 0..(ITEMS_IN_ROW - 1)) {
             val tableRow = TableRow(this)
             tableRow.layoutParams = LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        1.0f
+                    SCREEN_WIDTH,
+                    BUTTON_FRAME_WIDTH
                 )
+            tableRow.gravity = Gravity.CENTER
 
             for (column in 0..(ITEMS_IN_ROW - 1)) {
                 val framelayout = FrameLayout(this)
                 framelayout.layoutParams = TableRow.LayoutParams(
-                        TableRow.LayoutParams.MATCH_PARENT,
-                        TableRow.LayoutParams.MATCH_PARENT,
-                        1.0f
+                        BUTTON_FRAME_WIDTH,
+                        BUTTON_FRAME_WIDTH
                 )
                 val id = row * ITEMS_IN_ROW + column
 //                framelayout.id = id
@@ -125,8 +132,8 @@ class MainActivity : AppCompatActivity() {
                 button.id = id
                 button.setBackgroundResource(R.drawable.empty_shape)
                 button.layoutParams = FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
+                        BUTTON_FRAME_WIDTH,
+                        BUTTON_FRAME_WIDTH
                 )
                 val background = button.background
                 if (background is GradientDrawable)
@@ -135,10 +142,10 @@ class MainActivity : AppCompatActivity() {
                 val imageView = ImageView(this)
                 imageView.setBackgroundResource(R.drawable.circular_black_64dp)
                 val layout = FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
+                   FrameLayout.LayoutParams.MATCH_PARENT,
+                   FrameLayout.LayoutParams.MATCH_PARENT
                 )
-                layout.setMargins(5, 5, 5, 5)
+                layout.setMargins(NORMAL_MARGIN_PERC, NORMAL_MARGIN_PERC, NORMAL_MARGIN_PERC, NORMAL_MARGIN_PERC)
                 imageView.layoutParams = layout
                 imageView.elevation = 9.0f
                 imageView.scaleType = ImageView.ScaleType.CENTER
@@ -252,10 +259,10 @@ class MainActivity : AppCompatActivity() {
                             val myRunnableLow: Runnable = object : Runnable {
                                 override fun run() {
                                     val layout = FrameLayout.LayoutParams(
-                                            FrameLayout.LayoutParams.MATCH_PARENT,
-                                            FrameLayout.LayoutParams.MATCH_PARENT
+                                        FrameLayout.LayoutParams.MATCH_PARENT,
+                                        FrameLayout.LayoutParams.MATCH_PARENT
                                     )
-                                    layout.setMargins(5, 5, 5, 5)
+                                    layout.setMargins(NORMAL_MARGIN_PERC, NORMAL_MARGIN_PERC, NORMAL_MARGIN_PERC, NORMAL_MARGIN_PERC)
                                     imView.layoutParams = layout
 
                                     imView.requestLayout()
@@ -276,16 +283,16 @@ class MainActivity : AppCompatActivity() {
                             toast("Game is over :\\")
                         else {
                             hintedValuesForNextStep = generateRandomItems(CREATED_ITEMS_PER_STEP)
-                            for (value in hintedValuesForNextStep) {
-                                val buttonManager = buttonsManagersList[value]
+                            hintedValuesForNextStep.forEachIndexed { index, element ->
+                                val buttonManager = buttonsManagersList[element]
                                 val imView = buttonManager.imageView
-                                val myRunnableUp: Runnable = object : Runnable {
+                                val changeMarginsRunnable: Runnable = object : Runnable {
                                     override fun run() {
                                         val layout = FrameLayout.LayoutParams(
                                                 FrameLayout.LayoutParams.MATCH_PARENT,
                                                 FrameLayout.LayoutParams.MATCH_PARENT
                                         )
-                                        layout.setMargins(20, 20, 20, 20)
+                                        layout.setMargins(HINT_MARGIN_PERC, HINT_MARGIN_PERC, HINT_MARGIN_PERC, HINT_MARGIN_PERC)
                                         imView.layoutParams = layout
 
                                         imView.requestLayout()
@@ -293,10 +300,13 @@ class MainActivity : AppCompatActivity() {
                                         imView.refreshDrawableState()
                                         imView.forceLayout()
                                         imView.requestLayout()
-
                                     }
                                 }
-                                imView.post(myRunnableUp)
+
+                                imView.post(changeMarginsRunnable)
+                                val drawableRes = ButtonManager.imagesResourcesIdMap[buttonManager.resource]
+                                if (drawableRes != null)
+                                    hintedImagesPlaces[index].setBackgroundResource(drawableRes)
                             }
                         }
                     }
@@ -486,19 +496,56 @@ class MainActivity : AppCompatActivity() {
             buttonsTable.addView(tableRow)
         }
 
+
+//        <ImageView
+//        android:layout_width="match_parent"
+//        android:layout_height="match_parent"
+//        android:scaleType="center"
+//        android:src="@drawable/circular_black_64dp"
+//        android:layout_weight="1"/>
+        val hintedLayout = findViewById<LinearLayout>(R.id.next_turn_circles)
+        // Magic formuls for free spaces
+        val freeHintSpaces = (ITEMS_IN_ROW - CREATED_ITEMS_PER_STEP) * BUTTON_FRAME_WIDTH / (CREATED_ITEMS_PER_STEP + 1)
+            val startfreeSpace = ImageView(this)
+            startfreeSpace.layoutParams = LinearLayout.LayoutParams(
+                    freeHintSpaces,
+                    BUTTON_FRAME_WIDTH
+            )
+            hintedLayout.addView(startfreeSpace)
+        for (placeForHintedId in 1..CREATED_ITEMS_PER_STEP) {
+            val hintedDownImage = ImageView(this)
+            val layout = LinearLayout.LayoutParams(
+                    BUTTON_FRAME_WIDTH,
+                    BUTTON_FRAME_WIDTH
+            )
+            hintedDownImage.layoutParams = layout
+            hintedDownImage.scaleType = ImageView.ScaleType.CENTER
+            hintedDownImage.setBackgroundResource(R.drawable.circle_pink)
+            hintedLayout.addView(hintedDownImage)
+            hintedImagesPlaces.add(hintedDownImage)
+
+
+            val freeSpace = ImageView(this)
+            freeSpace.layoutParams = LinearLayout.LayoutParams(
+                    freeHintSpaces,
+                    BUTTON_FRAME_WIDTH
+            )
+            hintedLayout.addView(freeSpace)
+        }
+
         val hintedButtonsIds = generateRandomItems(CREATED_ITEMS_PER_STEP)
         convertHintedToNormal(hintedButtonsIds)
         hintedValuesForNextStep = generateRandomItems(CREATED_ITEMS_PER_STEP)
-        for (value in hintedValuesForNextStep) {
-            val buttonManager = buttonsManagersList[value]
+        hintedValuesForNextStep.forEachIndexed { index, element ->
+            val buttonManager = buttonsManagersList[element]
             val imView = buttonManager.imageView
-            val myRunnable: Runnable = object : Runnable {
+            val changeMarginsRunnable: Runnable = object : Runnable {
                 override fun run() {
                     val layout = FrameLayout.LayoutParams(
                             FrameLayout.LayoutParams.MATCH_PARENT,
                             FrameLayout.LayoutParams.MATCH_PARENT
                     )
-                    layout.setMargins(20, 20, 20, 20)
+                    layout.setMargins(HINT_MARGIN_PERC, HINT_MARGIN_PERC, HINT_MARGIN_PERC, HINT_MARGIN_PERC)
                     imView.layoutParams = layout
 
                     imView.requestLayout()
@@ -509,8 +556,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            imView.post(myRunnable)
-
+            imView.post(changeMarginsRunnable)
+            val drawableRes = ButtonManager.imagesResourcesIdMap[buttonManager.resource]
+            if (drawableRes != null)
+                hintedImagesPlaces[index].setBackgroundResource(drawableRes)
         }
     }
 

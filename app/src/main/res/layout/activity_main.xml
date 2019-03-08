@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:layout_weight="1.25"
+            android:layout_weight="1.23"
             android:layout_gravity="center"
             android:gravity="center"
             android:weightSum="3">
@@ -48,7 +48,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:layout_weight="1.18"
+            android:layout_weight="1.16"
             android:weightSum="3">
 
             <TextView
@@ -81,34 +81,18 @@
             android:id="@+id/buttons"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight="0.4">
+            android:gravity="center"
+            android:layout_weight="0.44">
         </TableLayout>
 
         <LinearLayout
+            android:id="@+id/next_turn_circles"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
             android:layout_weight="1.17"
             android:layout_gravity="center"
             android:gravity="center">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="center"
-                android:src="@drawable/circular_black_64dp"
-                android:layout_weight="1"/>
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scaleType="center"
-                android:src="@drawable/circular_black_64dp"
-                android:layout_weight="1"/>
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scaleType="center"
-                android:src="@drawable/circular_black_64dp"
-                android:layout_weight="1"/>
         </LinearLayout>
 
 
