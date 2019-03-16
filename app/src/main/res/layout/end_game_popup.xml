@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="250dp"
+    android:layout_height="150dp"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:background="@drawable/popup_back"
+    android:weightSum="4">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1.5"
+        android:weightSum="2">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            android:text="SCORE:"
+            android:textStyle="bold|italic"
+            android:background="#76FF03"
+            android:gravity="bottom|center"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            android:background="#00B0FF"
+            android:text="BEST:"
+            android:textStyle="bold|italic"
+
+            android:gravity="bottom|center"
+            />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1.5"
+        android:weightSum="2">
+        <TextView
+            android:id="@+id/end_cur_srore"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="19sp"
+            android:background="#76FF03"
+            android:text="0"
+            android:gravity="center|top"
+            />
+
+        <TextView
+            android:id="@+id/end_best_srore"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textSize="19sp"
+            android:text="0"
+            android:background="#00B0FF"
+            android:gravity="center|top"
+            />
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:weightSum="2">
+        <ImageView
+            android:id="@+id/end_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/ic_baseline_home_24px"
+            android:background="@drawable/orange_home"/>
+        <ImageView
+            android:id="@+id/end_reply"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@drawable/replay"
+            android:background="@drawable/green_reply"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>
